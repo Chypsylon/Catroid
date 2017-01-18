@@ -56,8 +56,10 @@ task buildStandalone() << {
     File programZip = file(project.ext.standaloneZipPath)
     println "programZip: " + programZip.absolutePath
 
-    programZip.withOutputStream {
-        it << new URL(downloadUrl).content
+    def cmd = "wget -O " + programZip.absolutePath + " " + downloadUrl
+    def ret = cmd.execute().waitFor()
+    if (ret != 0) {
+        throw new Exception("Download failed. Wget returned " + ret)
     }
 
     File zipOutDir = file(project.ext.standaloneTmpPath)
